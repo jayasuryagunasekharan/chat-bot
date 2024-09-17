@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini AI - Sci-Fi Interface</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Orbitron', sans-serif;
+            background: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background-color: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00cc00;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 30px #00cc00;
+        }
+        h1 {
+            text-align: center;
+            color: #00cc00;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #00cc00;
+        }
+        #chat-container {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #00cc00;
+            padding: 10px;
+            margin-bottom: 20px;
+            background-color: rgba(0, 20, 0, 0.5);
+        }
+        #input-container {
+            display: flex;
+            align-items: stretch;
+        }
+        #user-input {
+            flex-grow: 1;
+            padding: 15px;
+            font-size: 16px;
+            background-color: rgba(0, 50, 0, 0.5);
+            border: 1px solid #00cc00;
+            color: #00cc00;
+            font-family: 'Orbitron', sans-serif;
+            border-radius: 5px 0 0 5px;
+        }
+        #send-button {
+            padding: 15px 30px;
+            font-size: 16px;
+            background-color: #00cc00;
+            color: #000;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-family: 'Orbitron', sans-serif;
+            border-radius: 0 5px 5px 0;
+            transition: all 0.3s ease;
+        }
+        #send-button:hover {
+            background-color: #009900;
+            box-shadow: 0 0 10px #00cc00;
+        }
+        .message {
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 5px;
+            max-width: 80%;
+        }
+        .user-message {
+            background-color: rgba(0, 50, 0, 0.7);
+            text-align: right;
+            margin-left: auto;
+        }
+        .bot-message {
+            background-color: rgba(0, 30, 0, 0.7);
+            text-align: left;
+        }
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #001100;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #00cc00;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #009900;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>Gemini AI Interface</h1>
+        <div id="chat-container"></div>
+        <div id="input-container">
+            <input type="text" id="user-input" placeholder="Enter command...">
+            <button id="send-button">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+
+        function addMessage(sender, message) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', sender === 'You' ? 'user-message' : 'bot-message');
+            messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
+            chatContainer.appendChild(messageElement);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (message) {
+                addMessage('You', message);
+                userInput.value = '';
+
+                try {
+                    const response = await axios.post('/chat', { message: message });
+                    addMessage('Gemini', response.data.response);
+                } catch (error) {
+                    console.error('Error:', error);
+                    addMessage('Gemini', 'Error: Unable to process command.');
+                }
+            }
+        }
+
+        sendButton.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
